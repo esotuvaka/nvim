@@ -12,6 +12,10 @@ M.base46 = {
     -- 	Comment = { italic = true },
     -- 	["@comment"] = { italic = true },
     -- },
+    hl_override = {
+        Comment = { fg = "#FFA500" }, -- Right Orange
+        ["@comment"] = { fg = "#FFA500" }, -- Right Orange for Treesitter
+    },
 }
 
 -- M.nvdash = { load_on_startup = true }
