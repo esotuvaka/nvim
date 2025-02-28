@@ -88,6 +88,8 @@ vim.opt.diffopt:append "indent-heuristic"
 vim.opt.colorcolumn = "80"
 --- except in Rust where the rule is 100 characters
 vim.api.nvim_create_autocmd("Filetype", { pattern = "rust", command = "set colorcolumn=100" })
+--- except in Python where the rule is 88 characters
+vim.api.nvim_create_autocmd("Filetype", { pattern = "python", command = "set colorcolumn=88" })
 -- show more hidden characters
 -- also, show tabs nicer
 vim.opt.listchars = "tab:^ ,nbsp:¬,extends:»,precedes:«,trail:•"
