@@ -11,15 +11,51 @@ return {
             ensure_installed = {
                 "rust-analyzer",
                 "ruff",
+                "pyright",
+                "ts_ls",
             },
+        },
+    },
+    {
+        "williamboman/mason-lspconfig.nvim",
+        lazy = false,
+        opts = {
+            auto_install = true,
         },
     },
 
     -- -- These are some examples, uncomment them if you want to see them work!
     {
+        "hrsh7th/cmp-nvim-lsp",
+    },
+
+    {
         "neovim/nvim-lspconfig",
+        lazy = false,
         config = function()
-            require "configs.lspconfig"
+            local capabilities = require("cmp_nvim_lsp").default_capabilities()
+            local lspconfig = require "lspconfig"
+
+            lspconfig.ruff.setup {
+                capabilities = capabilities,
+            }
+            lspconfig.pyright.setup {
+                capabilities = capabilities,
+            }
+            lspconfig.rust_analyzer.setup {
+                capabilities = capabilities,
+            }
+            lspconfig.ts_ls.setup {
+                capabilities = capabilities,
+            }
+            lspconfig.lua_ls.setup {
+                capabilities = capabilities,
+            }
+
+            vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
+            vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
+            vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, {})
+            vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, {})
         end,
     },
 
@@ -104,54 +140,34 @@ return {
     -- LSP-based code-completion
     {
         "hrsh7th/nvim-cmp",
-        -- load cmp on InsertEnter
-        event = "InsertEnter",
-        -- these dependencies will only be loaded when cmp loads
-        -- dependencies are always lazy-loaded unless specified otherwise
-        dependencies = {
-            "hrsh7th/vim-vsnip",
-            "hrsh7th/cmp-vsnip",
-            "neovim/nvim-lspconfig",
-            "hrsh7th/cmp-nvim-lsp",
-            "hrsh7th/cmp-buffer",
-            "hrsh7th/cmp-path",
-            "hrsh7th/cmp-cmdline",
-        },
         config = function()
             local cmp = require "cmp"
+            require("luasnip.loaders.from_vscode").lazy_load()
+
             cmp.setup {
                 snippet = {
-                    -- REQUIRED by nvim-cmp. get rid of it once we can
                     expand = function(args)
-                        vim.fn["vsnip#anonymous"](args.body)
+                        require("luasnip").lsp_expand(args.body)
                     end,
+                },
+                window = {
+                    completion = cmp.config.window.bordered(),
+                    documentation = cmp.config.window.bordered(),
                 },
                 mapping = cmp.mapping.preset.insert {
                     ["<C-b>"] = cmp.mapping.scroll_docs(-4),
                     ["<C-f>"] = cmp.mapping.scroll_docs(4),
                     ["<C-Space>"] = cmp.mapping.complete(),
                     ["<C-e>"] = cmp.mapping.abort(),
-                    -- Accept currently selected item.
-                    -- Set `select` to `false` to only confirm explicitly selected items.
                     ["<CR>"] = cmp.mapping.confirm { select = true },
                 },
-                sources = cmp.config.sources {
+                sources = cmp.config.sources({
                     { name = "nvim_lsp" },
                     { name = "vsnip" },
+                }, {
                     { name = "buffer" },
-                    { name = "path" },
-                },
-                experimental = {
-                    ghost_text = true,
-                },
+                }),
             }
-
-            -- Enable completing paths in :
-            cmp.setup.cmdline(":", {
-                sources = cmp.config.sources {
-                    { name = "path" },
-                },
-            })
         end,
     },
     -- inline function signatures

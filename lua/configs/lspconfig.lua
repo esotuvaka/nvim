@@ -43,6 +43,9 @@ lspconfig.rust_analyzer.setup {
             },
         },
     },
+    on_attach = nvlsp.on_attach,
+    on_init = nvlsp.on_init,
+    capabilities = nvlsp.capabilities,
 }
 
 -- Bash LSP
@@ -66,7 +69,7 @@ lspconfig.pyright.setup = {
 
 -- Ruff for Python
 lspconfig.ruff.setup = {
-    cmd = { "ruff" },
+    cmd = { vim.fn.expand "~/.venvs/ruff/bin/ruff", "server", "--stdio" },
     filetypes = { "python" },
     root_dir = require("lspconfig").util.find_git_ancestor,
     init_options = {
