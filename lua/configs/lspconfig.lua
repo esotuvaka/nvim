@@ -23,6 +23,40 @@ lspconfig.ts_ls.setup {
     capabilities = nvlsp.capabilities,
 }
 
+-- Go
+lspconfig.gopls.setup {
+    on_attach = nvlsp.on_attach,
+    capabilities = nvlsp.capabilities,
+    root_dir = lspconfig.util.root_pattern(".git", "go.mod"),
+    flags = {
+        debounce_text_changes = 150,
+    },
+    settings = {
+        gopls = {
+            gofumpt = true,
+            experimentalPostfixCompletions = true,
+            staticcheck = true,
+            usePlaceholders = true,
+        },
+    },
+}
+if not lspconfig.golangcilsp then
+    local configs = require "lspconfig/configs"
+
+    configs.golangcilsp = {
+        default_config = {
+            cmd = { "golangci-lint-langserver" },
+            root_dir = lspconfig.util.root_pattern(".git", "go.mod"),
+            init_options = {
+                command = { "golangci-lint", "run", "--out-format", "json" },
+            },
+        },
+    }
+end
+lspconfig.golangcilsp.setup {
+    filetypes = { "go" },
+}
+
 -- ESLint linter
 lspconfig.eslint.setup {
     on_attach = nvlsp.on_attach,
